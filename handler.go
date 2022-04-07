@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"private-ghp/config"
 	"strings"
+	"time"
 
 	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
@@ -45,6 +46,8 @@ func setupHttpHandler() {
 					logrus.Debugf("content found for owner: %s, repo: %s, path: %s, branch: %s", page.Repository.Owner, page.Repository.Name, r.RequestURI, page.Repository.Branch)
 					sDec, _ := base64.StdEncoding.DecodeString(*c.Content)
 					setContentType(c, w, r.RequestURI)
+
+					setCache(page, c, w)
 					w.Write(sDec)
 				} else {
 					logrus.Debugf("content not found for owner: %s, repo: %s, path: %s, branch: %s", page.Repository.Owner, page.Repository.Name, r.RequestURI, page.Repository.Branch)
@@ -75,6 +78,13 @@ func findPage(r *http.Request, config *config.Config) (*config.Page, bool) {
 		}
 	}
 	return nil, false
+}
+
+func setCache(page *config.Page, c *github.RepositoryContent, w http.ResponseWriter) {
+	w.Header().Add("Cache-Control", fmt.Sprintf("public, max-age=%d", page.Cache.Duration))
+	w.Header().Add("ETag", c.GetSHA())
+	w.Header().Add("Expires", time.Now().Add(time.Duration(page.Cache.Duration)*time.Second).Format(http.TimeFormat))
+	w.Header().Add("Last-Modified", time.Now().Format(http.TimeFormat))
 }
 
 func setContentType(c *github.RepositoryContent, w http.ResponseWriter, uri string) {

@@ -17,7 +17,6 @@ func getGithubAccessToken(code string, config *config.Config) string {
 		"code":          code}
 	requestJSON, _ := json.Marshal(requestBodyMap)
 
-	// POST request to set URL
 	req, reqerr := http.NewRequest(
 		"POST",
 		"https://github.com/login/oauth/access_token",
