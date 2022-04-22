@@ -25,7 +25,7 @@ func setupHttpHandler() {
 			cookie, err := r.Cookie("token")
 			if err != nil {
 				redirectURL := fmt.Sprintf(
-					"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=http://%s/login/github/callback?origin=http://%s.%s/%s&scope=repo", config.Github.Client.Id, config.Url, page.Subdomain, config.Url, r.RequestURI)
+					"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=http://%s/login/github/callback?origin=http://%s.%s/%s&scope=repo", config.Github.Client.Id, config.Domain, page.Subdomain, config.Domain, r.RequestURI)
 				logrus.Debugf("no cookie found for request, redirecting to %s", redirectURL)
 				http.Redirect(w, r, redirectURL, 301)
 			} else {
@@ -34,13 +34,13 @@ func setupHttpHandler() {
 					&oauth2.Token{AccessToken: cookie.Value},
 				)
 
-				tc := oauth2.NewClient(ctx, ts)
-				client = github.NewClient(tc)
+				tc := oauth2.NewClient(oauth2.NoContext, ts)
+				client := github.NewClient(tc)
 
 				if r.RequestURI == "/" {
 					r.RequestURI = "/" + page.Index
 				}
-				c, _, _, err := client.Repositories.GetContents(ctx, page.Repository.Owner, page.Repository.Name, r.RequestURI, &github.RepositoryContentGetOptions{Ref: page.Repository.Branch})
+				c, _, _, err := client.Repositories.GetContents(oauth2.NoContext, page.Repository.Owner, page.Repository.Name, r.RequestURI, &github.RepositoryContentGetOptions{Ref: page.Repository.Branch})
 				logrus.Debugf("requesting content for owner: %s, repo: %s, path: %s, branch: %s", page.Repository.Owner, page.Repository.Name, r.RequestURI, page.Repository.Branch)
 				if err == nil {
 					logrus.Debugf("content found for owner: %s, repo: %s, path: %s, branch: %s", page.Repository.Owner, page.Repository.Name, r.RequestURI, page.Repository.Branch)
@@ -64,7 +64,7 @@ func setupHttpHandler() {
 		code := r.URL.Query().Get("code")
 		token := getGithubAccessToken(code, config)
 
-		w.Header().Add("Set-Cookie", fmt.Sprintf("token=%s; Domain=.%s; Path=/; HttpOnly", token, config.Url))
+		w.Header().Add("Set-Cookie", fmt.Sprintf("token=%s; Domain=.%s; Path=/; HttpOnly", token, config.Domain))
 		redirectURL := origin
 		logrus.Debugf("token recevied from github, redirecting to %s", redirectURL)
 		http.Redirect(w, r, redirectURL, 301)
@@ -73,7 +73,7 @@ func setupHttpHandler() {
 
 func findPage(r *http.Request, config *config.Config) (*config.Page, bool) {
 	for _, page := range config.Pages {
-		if fmt.Sprintf("%s.%s", page.Subdomain, config.Url) == r.Host {
+		if fmt.Sprintf("%s.%s", page.Subdomain, config.Domain) == r.Host {
 			return &page, true
 		}
 	}

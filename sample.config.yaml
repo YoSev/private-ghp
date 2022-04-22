@@ -1,0 +1,17 @@
+port: 8080
+domain: your.domain
+log:
+  level: debug
+github:
+  client:
+    id: client_id
+    secret: client_secret
+pages:
+  - subdomain: test #the sub-domain part WITHOUT the main domain
+    index: index.html
+    cache:
+      duration: 1800   
+    repository:
+      owner: owner/organization
+      name: repository
+      branch: branch # eg. gh-pages

@@ -11,9 +11,9 @@ import (
 )
 
 type Config struct {
-	Port int64  `yaml:"port"`
-	Url  string `yaml:"url"`
-	Log  struct {
+	Port   int64  `yaml:"port"`
+	Domain string `yaml:"domain"`
+	Log    struct {
 		Level string `yaml:"level"`
 	}
 	Github struct {
