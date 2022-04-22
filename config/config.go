@@ -11,9 +11,10 @@ import (
 )
 
 type Config struct {
-	Port   int64  `yaml:"port"`
-	Domain string `yaml:"domain"`
-	Log    struct {
+	Port       int64  `yaml:"port"`
+	PublicPort int64  `yaml:"publicPort"`
+	Domain     string `yaml:"domain"`
+	Log        struct {
 		Level string `yaml:"level"`
 	}
 	Github struct {

@@ -25,7 +25,7 @@ func setupHttpHandler() {
 			cookie, err := r.Cookie("token")
 			if err != nil {
 				redirectURL := fmt.Sprintf(
-					"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=http://%s/login/github/callback?origin=http://%s.%s/%s&scope=repo", config.Github.Client.Id, config.Domain, page.Subdomain, config.Domain, r.RequestURI)
+					"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=http://%s:%d/login/github/callback?origin=http://%s.%s:%d/%s&scope=repo", config.Github.Client.Id, config.Domain, config.PublicPort, page.Subdomain, config.Domain, config.PublicPort, r.RequestURI)
 				logrus.Debugf("no cookie found for request, redirecting to %s", redirectURL)
 				http.Redirect(w, r, redirectURL, 301)
 			} else {
@@ -73,7 +73,7 @@ func setupHttpHandler() {
 
 func findPage(r *http.Request, config *config.Config) (*config.Page, bool) {
 	for _, page := range config.Pages {
-		if fmt.Sprintf("%s.%s", page.Subdomain, config.Domain) == r.Host {
+		if fmt.Sprintf("%s.%s:%d", page.Subdomain, config.Domain, config.PublicPort) == r.Host {
 			return &page, true
 		}
 	}
