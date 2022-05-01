@@ -1,6 +1,6 @@
 port: 8080
 publicPort: 8080
-domain: your.domain
+domain: your.domain # localhost does not work (see README)
 log:
   level: debug
 github:

@@ -25,8 +25,8 @@ func setupHttpHandler() {
 			cookie, err := r.Cookie("token")
 			if err != nil {
 				redirectURL := fmt.Sprintf(
-					"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=http://%s:%d/login/github/callback?origin=http://%s.%s:%d/%s&scope=repo", config.Github.Client.Id, config.Domain, config.PublicPort, page.Subdomain, config.Domain, config.PublicPort, r.RequestURI)
-				logrus.Debugf("no cookie found for request, redirecting to %s", redirectURL)
+					"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=http://%s:%d/login/github/callback?origin=http://%s.%s:%d%s&scope=repo", config.Github.Client.Id, config.Domain, config.PublicPort, page.Subdomain, config.Domain, config.PublicPort, r.RequestURI)
+				logrus.Debugf("no valid cookie found for request, redirecting to %s", redirectURL)
 				http.Redirect(w, r, redirectURL, 301)
 			} else {
 				logrus.Debugf("cookie found for request %s", r.Host)
@@ -66,7 +66,7 @@ func setupHttpHandler() {
 
 		w.Header().Add("Set-Cookie", fmt.Sprintf("token=%s; Domain=.%s; Path=/; HttpOnly", token, config.Domain))
 		redirectURL := origin
-		logrus.Debugf("token recevied from github, redirecting to %s", redirectURL)
+		logrus.Debugf("token recevied from github (%s:%s), redirecting to %s", code, token, redirectURL)
 		http.Redirect(w, r, redirectURL, 301)
 	})
 }

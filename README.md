@@ -38,6 +38,10 @@ To protect your site using SSL, we advice to use a reverse proxy like [Traefik](
 - Third, execute the binary or docker image
   - ./prviate-ghp --config=\<path_to_config\>
 
+## localhost as domain does not work
+localhost does **not work** as the app uses cross origin resource sharing which is not applied to localhost. \
+You need to use a [FQDN](https://en.wikipedia.org/wiki/Fully_qualified_domain_name) like local.host to work.
+
 ## Architecture
 
 This is a high level explanation of how this project works.
