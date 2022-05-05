@@ -73,7 +73,7 @@ func setupHttpHandler() {
 
 func findPage(r *http.Request, config *config.Config) (*config.Page, bool) {
 	for _, page := range config.Pages {
-		if fmt.Sprintf("%s.%s:%d", page.Subdomain, config.Domain, config.PublicPort) == r.Host {
+		if fmt.Sprintf("%s.%s:%d", page.Subdomain, config.Domain, config.PublicPort) == r.Host || fmt.Sprintf("%s.%s", page.Subdomain, config.Domain) == r.Host {
 			return &page, true
 		}
 	}
